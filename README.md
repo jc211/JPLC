@@ -1,3 +1,6 @@
+# Notice
+[S7NetPlus](https://github.com/S7NetPlus) is a similar project that does what this project initially aimed to do. It seems more current and should be used instead of this repo.
+
 # JPLC
 This is code that augments [Snap7](http://snap7.sourceforge.net/) functionality so that you don't have to deal with bytes directly and can transfer information from a Siemens PLC directly to C# in a seamless manner. It allows you to describe UDTs and datablocks in C# using attributes. 
 
@@ -73,3 +76,4 @@ myDatablock.WriteToDB(24);
 
 ## Restrictions
 Must be non-optimized datablock.
+
