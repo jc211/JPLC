@@ -14,6 +14,7 @@ namespace JPLC
         public static int Rack = 0;
         public static int Slot = 2;
         public S7Client S7Api;
+        public static string LastError = "";
         #endregion
 
         #region [Constructors]
@@ -37,7 +38,7 @@ namespace JPLC
         #endregion
 
         #region [Methods]
-        public void Connect()
+        public int Connect()
         {            
             int result = S7Api.ConnectTo(IPAddress, Rack, Slot);
             if(result == 0)
@@ -48,9 +49,11 @@ namespace JPLC
             {
                 Connected = true;
             }
+            LastError = S7Api.ErrorText(result);
+            return result;
           
         }
-        public void Disconnect()
+        public int Disconnect()
         {
             int result = S7Api.Disconnect();
             if (result == 0)
@@ -61,6 +64,8 @@ namespace JPLC
             {
                 Connected = true;
             }
+            LastError = S7Api.ErrorText(result);
+            return result;
         }
         #endregion
     }

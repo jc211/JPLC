@@ -15,6 +15,8 @@ namespace JPLC
         public int Address { get; private set; }
         //public Timer Watcher = new Timer();
         public int DBNumber;
+
+        public string LastError { get; private set; } = "";
        // public int WatcherDBNumber;
         #endregion
 
@@ -257,9 +259,11 @@ namespace JPLC
             
             if (result != 0)
             {
+                LastError = JPLCConnection.Instance.S7Api.ErrorText(result);
                 return result;
             }
             ReadFromByteArray(data);
+
             return result;
         }
 
@@ -268,7 +272,7 @@ namespace JPLC
             return ReadFromDB();
         }
 
-        public bool WriteToDB(int dbNumber=0)
+        public int WriteToDB(int dbNumber=0)
         {
             if (!JPLCConnection.Instance.Connected)
             {
@@ -283,13 +287,15 @@ namespace JPLC
             
             if (result != 0)
             {
-                return false;
+                LastError = JPLCConnection.Instance.S7Api.ErrorText(result);
+
+                return result;
             }
-            return true;
+            return result;
  
         }
 
-        public bool Write()
+        public int Write()
         {
             return WriteToDB();
         }
