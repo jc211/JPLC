@@ -86,8 +86,7 @@ namespace JPLC
             //===================================================================
             walker.DateTimeFound += (propertyWrapper, offsetFromStartOfWalk) => {
                 JPLCProperty<DateTime> JPLCProperty = propertyWrapper.Property as JPLCProperty<DateTime>;
-                JPLCProperty.Value  = JPLC.Core.DataTypes.DateTime.FromByteArray(data.Skip((int)offsetFromStartOfWalk).Take(8).ToArray());
-                //JPLCProperty.Value = S7.GetDateTimeAt(data, (int)offsetFromStartOfWalk);
+                JPLCProperty.Value = S7.GetDateTimeAt(data, (int)offsetFromStartOfWalk);
             };
 
             //===================================================================

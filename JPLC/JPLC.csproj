@@ -53,7 +53,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\DataTypes\DateTime.cs" />
     <Compile Include="Core\JPLCConnection.cs" />
     <Compile Include="Core\JPLCProperty.cs" />
     <Compile Include="Core\JPLC_Attributes.cs" />
