@@ -14,7 +14,7 @@ namespace JPLC
         public static int Rack = 0;
         public static int Slot = 2;
         public S7Client S7Api;
-        public static string LastError = "";
+        public string LastError = "";
         #endregion
 
         #region [Constructors]
@@ -43,11 +43,11 @@ namespace JPLC
             int result = S7Api.ConnectTo(IPAddress, Rack, Slot);
             if(result == 0)
             {
-                Connected = false;
+                Connected = true;
             }
             else
             {
-                Connected = true;
+                Connected = false;
             }
             LastError = S7Api.ErrorText(result);
             return result;
