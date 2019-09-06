@@ -1,39 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Snap7;
-using System.Diagnostics;
-using NLog;
-using Cinch;
-using MEFedMVVM.Common;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
+﻿using Snap7;
 
 namespace JPLC
 {
     // Singleton
-    public class JPLCConnection:ViewModelBase
+    public class JPLCConnection
     {       
         #region [Private]
-        private static Logger logger = LogManager.GetCurrentClassLogger();
         private static JPLCConnection instance;
-        #endregion
-
-        #region [Events]
-        private BehaviorSubject<ConnectedEventArgs> connectedEvent = new BehaviorSubject<ConnectedEventArgs>(new ConnectedEventArgs(false,false,"Initial"));
-        public IObservable<ConnectedEventArgs> ConnectedEvent
-        {
-            get { return this.connectedEvent.AsObservable().DistinctUntilChanged(); }
-        }
         #endregion
 
         #region [Public]
         public static string IPAddress = "192.168.0.11";
         public static int Rack = 0;
         public static int Slot = 2;
-
         public S7Client S7Api;
         #endregion
 
@@ -54,43 +33,34 @@ namespace JPLC
                 return instance;
             }
         }
-        public bool Connected { get { return connectedEvent.Value.IsConnected; } }
+        public bool Connected { get; private set; }
         #endregion
 
         #region [Methods]
         public void Connect()
-        {
-            logger.Info("Connecting to " + JPLCConnection.IPAddress + " Rack: " + JPLCConnection.Rack + " Slot: " +JPLCConnection.Slot );
-            
-            int result = S7Api.ConnectTo(JPLCConnection.IPAddress, JPLCConnection.Rack, JPLCConnection.Slot);
+        {            
+            int result = S7Api.ConnectTo(IPAddress, Rack, Slot);
             if(result == 0)
             {
-                connectedEvent.OnNext(new ConnectedEventArgs(true, false, S7Api.ErrorText(result)));
-                NotifyPropertyChanged("Connected");
+                Connected = false;
             }
             else
             {
-                connectedEvent.OnNext(new ConnectedEventArgs(false, true, S7Api.ErrorText(result)));
-                NotifyPropertyChanged("Connected");
+                Connected = true;
             }
-            logger.Info(S7Api.ErrorText(result));
           
         }
         public void Disconnect()
         {
-            logger.Info("Disconnecting");
             int result = S7Api.Disconnect();
             if (result == 0)
             {
-                connectedEvent.OnNext(new ConnectedEventArgs(false, false, S7Api.ErrorText(result)));
-                NotifyPropertyChanged("Connected");
+                Connected = false;
             }
             else
             {
-                connectedEvent.OnNext(new ConnectedEventArgs(true, true, S7Api.ErrorText(result)));
-                NotifyPropertyChanged("Connected");
+                Connected = true;
             }
-            logger.Info(S7Api.ErrorText(result));    
         }
         #endregion
     }

@@ -1,33 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
 using Snap7;
-using System.Diagnostics;
-using System.Timers;
-using NLog;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Reactive;
-using System.Reactive.Concurrency;
 
 namespace JPLC
 {
-    public abstract class JPLC_BASE : IDisposable
+    public abstract class JPLC_BASE
     {
-        #region [Private]
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        #endregion
-
-        #region [Events]
-        private Subject<JPLC_BASE> updated = new Subject<JPLC_BASE>();
-        public IObservable<Timestamped<JPLC_BASE>> Updated
-        {
-            get { return this.updated.Timestamp().AsObservable(); }
-        }
-        #endregion
 
         #region [Public Propertes]
         public int SizeInBytes { get; internal set; }
@@ -160,10 +140,6 @@ namespace JPLC
             walker.BooleanFound += (propertyWrapper, offsetFromStartOfWalk) =>
             {
                 JPLCProperty<bool> JPLCProperty = propertyWrapper.Property as JPLCProperty<bool>;
-                if (propertyWrapper.Name == "PS_Location" || propertyWrapper.Name == "DS_Location" || propertyWrapper.Name == "LHD_Location")
-                {
-                   // Console.WriteLine("HERE");
-                }
                 double truncatedOffset = Math.Truncate(offsetFromStartOfWalk);
                 double difference = Math.Round((offsetFromStartOfWalk - truncatedOffset)*10);
                 int bitNumber = (int)(difference); // (2.3 -2)*10 = 3
@@ -235,8 +211,6 @@ namespace JPLC
             {
                 JPLCProperty<S7Time> JPLCProperty = propertyWrapper.Property as JPLCProperty<S7Time>;
                 S7.SetTODAt(data, (int)offsetFromStartOfWalk, JPLCProperty.Value.Time);
-
-
             };
 
             //===================================================================
@@ -283,13 +257,9 @@ namespace JPLC
             
             if (result != 0)
             {
-                logger.Warn("Reading from DB: " + dbNumber + " - " + result + " - " + JPLCConnection.Instance.S7Api.ErrorText(result));
                 return result;
-                //throw new Exception("Error reading from DB");
             }
-            logger.Debug("Reading from DB: " + dbNumber + " - " + result + " - "+ JPLCConnection.Instance.S7Api.ErrorText(result));
             ReadFromByteArray(data);
-            updated.OnNext(this);
             return result;
         }
 
@@ -313,11 +283,8 @@ namespace JPLC
             
             if (result != 0)
             {
-                logger.Warn("Writing to DB: " + dbNumber + " - " + JPLCConnection.Instance.S7Api.ErrorText(result));
                 return false;
-                //throw new Exception("Error reading from DB");
             }
-            logger.Info("Writing to DB: " + dbNumber + " - " + JPLCConnection.Instance.S7Api.ErrorText(result));
             return true;
  
         }
@@ -326,43 +293,6 @@ namespace JPLC
         {
             return WriteToDB();
         }
-        public bool Watching { get; internal set; }
-        IDisposable watchingDisposable;
-        public IObservable<Timestamped<int>> WatchFromDB(int dbNumber, double timeInterval = 1000, double timeoutTime = 2000)
-        {
-           StopWatching();
-           Watching = true;
-            var c = Observable.Timer(TimeSpan.FromMilliseconds(timeInterval), TimeSpan.FromMilliseconds(timeInterval))
-                     .TakeWhile(x => Watching && JPLC.JPLCConnection.Instance.Connected)
-                    // .Do((i) => Console.WriteLine("Interval " + i))
-                     .Select(x => {
-                         int db = dbNumber; int res =  ReadFromDB(db);
-                         return res;
-                     })
-                    // .Do((i) => Console.WriteLine("Select"))
-                     .TakeWhile(res => res == 0)
-                     .Timestamp()
-                   //  .Do(x => Console.WriteLine(x.Value))
-                     .Timeout(TimeSpan.FromMilliseconds(timeoutTime))
-                     .Retry(10)
-                     .Finally(() => { Watching = false; })
-                     .Replay(1);
-                      //599877
-            watchingDisposable = c.Connect();
-
-            return c.AsObservable();
-        }
-        
-        public void StopWatching()
-        {
-            if(watchingDisposable!= null)
-                watchingDisposable.Dispose();
-            Watching = false;
-        }
-        #endregion
-
-        #region [Helper]
-
         #endregion
 
         #region [Private Methods]
@@ -372,7 +302,6 @@ namespace JPLC
                                  let orderAttribute = (property.GetCustomAttributes(typeof(OrderAttribute), false).SingleOrDefault() as OrderAttribute)
                                  orderby orderAttribute.Order
                                  select property;
-            //SizeInBytes = InitializeProperties();
             InitializeProperties();
         }
 
@@ -436,7 +365,6 @@ namespace JPLC
                 Type genericType = propertyWrapper.PropertyType.GetGenericArguments()[0];
                 var udt = Activator.CreateInstance(genericType, (int)(offsetFromStartOfWalk + this.Address)) as JPLC_BASE; // Creates the udt
                 propertyWrapper.Property = Activator.CreateInstance(propertyWrapper.PropertyType, udt, propertyWrapper.Name, this, (int)offsetFromStartOfWalk); // Creates the PLCProperty<udt>
-
             };
             
             //===================================================================
@@ -446,23 +374,14 @@ namespace JPLC
                 var stringProperty = new JPLCProperty<string>(propertyWrapper.Name, this, offsetFromStartOfWalk);
                 stringProperty.Value = "";
                 propertyWrapper.Property = stringProperty;   
-
-            
             };
 
             //===================================================================
             // END OF WALK 
             //===================================================================
             walker.WalkCompleted += (offsetFromStartOfWalk) => { SizeInBytes = (int)offsetFromStartOfWalk; };
-            
-            
             walker.Walk();
 
-        }
-
-        public void Dispose()
-        {
-            StopWatching();
         }
 
         #endregion
