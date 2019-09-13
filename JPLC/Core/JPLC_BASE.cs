@@ -248,7 +248,7 @@ namespace JPLC
         {
             if (!connection.Connected)
             {
-                throw new TargetException("JPLC not connected to a PLC");
+                return -1;
             }
             if (dbNumber == 0)
             {
@@ -276,7 +276,7 @@ namespace JPLC
         {
             if (!connection.Connected)
             {
-                throw new TargetException("JPLC not connected to a PLC");
+                return -1;
             }
             if (dbNumber == 0)
             {
