@@ -5,35 +5,22 @@ namespace JPLC
     // Singleton
     public class JPLCConnection
     {       
-        #region [Private]
-        private static JPLCConnection instance;
-        #endregion
-
         #region [Public]
-        public static string IPAddress = "192.168.0.11";
-        public static int Rack = 0;
-        public static int Slot = 2;
-        public S7Client S7Api;
-        public string LastError = "";
+        public string IPAddress { get; private set; } = "192.168.0.11";
+        public int Rack { get; private set; } = 0;
+        public int Slot { get; private set; } =  2;
+        public S7Client S7Api { get; private set; }
+        public string LastError { get; private set; } = "";
         #endregion
 
         #region [Constructors]
-        private JPLCConnection() {
+        private JPLCConnection(string ipAddress, int rack, int slot) {
+            IPAddress = ipAddress;
+            Rack = rack;
+            Slot = slot;
             S7Api = new S7Client();      
         }
 
-        public static JPLCConnection Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new JPLCConnection();
-                    instance.S7Api = new S7Client();
-                }
-                return instance;
-            }
-        }
         public bool Connected { get; private set; }
         #endregion
 
@@ -68,17 +55,5 @@ namespace JPLC
             return result;
         }
         #endregion
-    }
-    public class ConnectedEventArgs
-    {
-        public bool IsConnected { get; private set; }
-        public string ErrorMessage { get; private set; }
-        public bool HasError { get; private set; }
-        public ConnectedEventArgs(bool isConnected, bool hasError, string errorMessage)
-        {
-            HasError = hasError;
-            IsConnected = isConnected;
-            ErrorMessage = errorMessage;
-        }
     }
 }

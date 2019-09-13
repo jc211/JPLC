@@ -244,9 +244,9 @@ namespace JPLC
 
 
 
-        public int ReadFromDB(int dbNumber = 0)
+        public int ReadFromDB(JPLCConnection connection, int dbNumber = 0)
         {
-            if (!JPLCConnection.Instance.Connected)
+            if (!connection.Connected)
             {
                 throw new TargetException("JPLC not connected to a PLC");
             }
@@ -255,11 +255,11 @@ namespace JPLC
                 dbNumber = DBNumber;
             }
             byte[] data = new byte[this.SizeInBytes];
-            int result = JPLCConnection.Instance.S7Api.DBRead(dbNumber, this.Address, this.SizeInBytes, data);
+            int result = connection.S7Api.DBRead(dbNumber, this.Address, this.SizeInBytes, data);
             
             if (result != 0)
             {
-                LastError = JPLCConnection.Instance.S7Api.ErrorText(result);
+                LastError = connection.S7Api.ErrorText(result);
                 return result;
             }
             ReadFromByteArray(data);
@@ -267,14 +267,14 @@ namespace JPLC
             return result;
         }
 
-        public int Read()
+        public int Read(JPLCConnection connection)
         {
-            return ReadFromDB();
+            return ReadFromDB(connection);
         }
 
-        public int WriteToDB(int dbNumber=0)
+        public int WriteToDB(JPLCConnection connection, int dbNumber =0)
         {
-            if (!JPLCConnection.Instance.Connected)
+            if (!connection.Connected)
             {
                 throw new TargetException("JPLC not connected to a PLC");
             }
@@ -283,11 +283,11 @@ namespace JPLC
                 dbNumber = DBNumber;
             }
             byte[] data = WriteToByteArray();
-            int result = JPLCConnection.Instance.S7Api.DBWrite(dbNumber, this.Address, this.SizeInBytes, data);
+            int result = connection.S7Api.DBWrite(dbNumber, this.Address, this.SizeInBytes, data);
             
             if (result != 0)
             {
-                LastError = JPLCConnection.Instance.S7Api.ErrorText(result);
+                LastError = connection.S7Api.ErrorText(result);
 
                 return result;
             }
@@ -295,9 +295,9 @@ namespace JPLC
  
         }
 
-        public int Write()
+        public int Write(JPLCConnection connection)
         {
-            return WriteToDB();
+            return WriteToDB(connection);
         }
         #endregion
 
