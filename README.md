@@ -1,5 +1,5 @@
 # Notice
-[S7NetPlus](https://github.com/S7NetPlus) is a similar project that does what this project initially aimed to do. It seems more current and should be used instead of this repo.
+[S7NetPlus](https://github.com/S7NetPlus) is a similar project that does what this project initially aimed to do. This project differs in that it allows you to write and read arrays and strings of various sizes. It is also possible to read and write an individual property rather than a whole DB.
 
 # JPLC
 This is code that augments [Snap7](http://snap7.sourceforge.net/) functionality so that you don't have to deal with bytes directly and can transfer information from a Siemens PLC directly to C# in a seamless manner. It allows you to describe UDTs and datablocks in C# using attributes. 
@@ -55,16 +55,11 @@ public class MyDatablock : JPLC_BASE
 JPLCConnection is a wrapper around the S7Client.
 
 ```c#
-JPLCConnection.IPAddress = "192.168.0.1";
-JPLCConnection.Rack = 0;
-JPLCConnection.Slot = 2;
+var connection = JPLCConnection("192.168.0.1", 0 ,2)
+connection.Connect(); 
 
-JPLCConnection.Instance.Connect(); 
-
-var myDatablock = new MyDatablock(24);
-myDatablock.Read();
-// OR 
-myDatablock.ReadFromDB(24); // Use datablock number
+var myDatablock = new MyDatablock();
+myDatablock.ReadFromDB(connection, 24); // 24: Datablock Number
 
 // To Write
 myDatablock.MyBool.Value = false;
