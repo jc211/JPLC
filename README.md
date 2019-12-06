@@ -1,5 +1,5 @@
 # Notice
-[S7NetPlus](https://github.com/S7NetPlus) is a similar project that does what this project initially aimed to do. This project differs in that it allows you to write and read arrays and strings of various sizes. It is also possible to read and write an individual property rather than a whole DB.
+[S7NetPlus](https://github.com/S7NetPlus) is a similar project that does what this project initially aimed to do. This project differs in that it allows you to write and read arrays, double arrays, and strings of various sizes. It is also possible to read and write an individual property rather than a whole DB.
 
 # JPLC
 This is code that augments [Snap7](http://snap7.sourceforge.net/) functionality so that you don't have to deal with bytes directly and can transfer information from a Siemens PLC directly to C# in a seamless manner. It allows you to describe UDTs and datablocks in C# using attributes. 
@@ -45,6 +45,12 @@ public class MyDatablock : JPLC_BASE
     public JPLCProperty<string> MyString { get; set; }
     [Order(10)]
     public JPLCProperty<float> MyReal { get; set; }
+    [Order(11)]
+    [DoubleArraySize(10, 10)]
+    public JPLCProperty<int>[,] DoubleArray { get; set; }
+    [Order(12)]
+    [DoubleArraySize(10, 10)]
+    public JPLCProperty<MyUDT>[,] ComplexDoubleArray { get; set; }
     
     public MyDatablock(int address = 0) : base(address) { }
 }
@@ -64,9 +70,7 @@ myDatablock.ReadFromDB(connection, 24); // 24: Datablock Number
 // To Write
 myDatablock.MyBool.Value = false;
 myDatablock.MyInteger.Value = 3;
-myDatablock.Write();
-// OR
-myDatablock.WriteToDB(24);
+myDatablock.WriteToDB(24); // 24: Datablock Number
 ```
 
 ## Restrictions
