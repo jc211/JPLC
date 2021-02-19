@@ -1,8 +1,5 @@
-# Notice
-[S7NetPlus](https://github.com/S7NetPlus) is a similar project that does what this project initially aimed to do. This project differs in that it allows you to write and read arrays, double arrays, and strings of various sizes. It is also possible to read and write an individual property rather than a whole DB.
-
 # JPLC
-This is code that augments [Snap7](http://snap7.sourceforge.net/) functionality so that you don't have to deal with bytes directly and can transfer information from a Siemens PLC directly to C# in a seamless manner. It allows you to describe UDTs and datablocks in C# using attributes. 
+This is code that augments [Snap7](http://snap7.sourceforge.net/) functionality so that you don't have to deal with bytes and can transfer information from a Siemens PLC directly to C# in a seamless manner. It allows you to describe UDTs and datablocks in C# using attributes. 
 
 ## Use
 Lets say we had a datablock in a Siemens PLC called MyDatablock with various types of properties inside it. 
