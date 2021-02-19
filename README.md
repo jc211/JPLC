@@ -67,7 +67,7 @@ myDatablock.ReadFromDB(connection, 24); // 24: Datablock Number
 // To Write
 myDatablock.MyBool.Value = false;
 myDatablock.MyInteger.Value = 3;
-myDatablock.WriteToDB(24); // 24: Datablock Number
+myDatablock.WriteToDB(connection, 24); // 24: Datablock Number
 ```
 
 ## Restrictions
